@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { json } = require('express')
+// const { json } = require('express')
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
@@ -21,10 +21,10 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 
 // Query people in database and save in array
-personList = []
+const personList = []
 Person.find({}).then(result => {
   result.forEach(person => {
-   personList.push(person)
+    personList.push(person)
   })
 })
 
@@ -64,9 +64,9 @@ app.delete('/api/persons/:id', (request, response, next) => {
 
 app.post('/api/persons', (request, response, next) => {
   const body = request.body
-  const persons = personList.find(person => person.name === body.name)
+  // const persons = personList.find(person => person.name === body.name)
 
-  if (!body.name || !body.number) {
+  if (!body.name) {
     return response.status(400).json({
       error: 'name missing'
     })
@@ -75,7 +75,7 @@ app.post('/api/persons', (request, response, next) => {
       error: 'number missing'
     })
   }
- 
+
   const person = new Person ({
     name: body.name,
     number: body.number
@@ -84,13 +84,13 @@ app.post('/api/persons', (request, response, next) => {
   person.save().then(savedPerson => {
     response.send(savedPerson)
   })
-  .catch(error => next(error))
-  
+    .catch(error => next(error))
+
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
   const body = request.body
-  
+
   const person = {
     name: body.name,
     number: body.number,
@@ -104,7 +104,7 @@ app.put('/api/persons/:id', (request, response, next) => {
 })
 
 const unknownEndpoint = (request, response) => {
-  response.status(404).send({error: 'unknown endpoint' })
+  response.status(404).send({ error: 'unknown endpoint' })
 }
 
 app.use(unknownEndpoint)
