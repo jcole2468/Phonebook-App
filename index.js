@@ -29,9 +29,9 @@ Person.find({}).then(result => {
 })
 
 
-app.get('/', (request,response) => {
-  response.send('<h1>PhoneBook</h1>')
-})
+// app.get('/', (request,response) => {
+//   response.send('<h1>PhoneBook</h1>')
+// })
 
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
@@ -40,7 +40,7 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/info', (request, response) => {
-  const totalIds = personList.length 
+  const totalIds = personList.length
   const postDate = new Date()
 
   response.send(`
@@ -48,15 +48,17 @@ app.get('/info', (request, response) => {
     <p>${postDate}</p>`)
 })
 
-app.get('/api/persons/:id', (request, response) => {
-  Person.findById(request.params.id).then(person => {
-    response.json(person)
-  })
+app.get('/api/persons/:id', (request, response, next) => {
+  Person.findById(request.params.id)
+    .then(person => {
+      response.json(person)
+    })
+    .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
@@ -96,7 +98,7 @@ app.put('/api/persons/:id', (request, response, next) => {
     number: body.number,
   }
 
-  Person.findByIdAndUpdate(request.params.id, person, {new: true, runValidators: true, context: 'query' })
+  Person.findByIdAndUpdate(request.params.id, person, { new: true, runValidators: true, context: 'query' })
     .then(updatedPerson => {
       response.json(updatedPerson)
     })
@@ -121,7 +123,7 @@ const errorHandler = (error, request, response, next) => {
   next(error)
 }
 
-app.use(errorHandler) 
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
